@@ -1,19 +1,16 @@
 package main
 
-import (
-	"fmt"
-	"learn-go/sum"
-)
+import "learn-go/database"
 
 func main() {
 	//
-	sum.Add()
-	fmt.Println(sum.Total)
-	sum.Total = 100
-	fmt.Println(sum.Total)
-	sum.Sub()
+	//sum.Add()
+	//fmt.Println(sum.Total)
+	//sum.Total = 100
+	//fmt.Println(sum.Total)
+	////sum.Sub()
 
-	//db.ReadData()
-	//db.Conn = "postgres"
-	//db.ReadData()
+	database.ReadData()
+	database.Conn = "postgres"
+	database.ReadData()
 }

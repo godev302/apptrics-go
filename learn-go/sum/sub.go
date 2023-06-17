@@ -2,7 +2,22 @@ package sum
 
 import "fmt"
 
-func Sub() {
+func sub() {
 	fmt.Println(100 - 90)
 	print()
 }
+
+/*
+
+package main
+
+
+func main() {
+
+
+	sum.sub()
+
+}
+
+
+*/
