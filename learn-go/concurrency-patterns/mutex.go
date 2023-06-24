@@ -42,3 +42,7 @@ func bookCab(name string, m *sync.Mutex, wg *sync.WaitGroup) {
 	m.Unlock() // releasing the lock
 	fmt.Println()
 }
+
+// create a global variable to store result of the sum of two numbers and print the result
+// create a func that accepts two int value and store the addition of the values in sum variable
+// in main function run the sum function as a goroutine 10 times
