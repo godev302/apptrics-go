@@ -1,0 +1,2 @@
+user would hit endpoint search to search a particular user in the database
+if user is not present than we would return an error otherwise we would return valid details
