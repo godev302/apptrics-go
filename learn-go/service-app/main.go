@@ -3,13 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"service-app/auth"
+	"service-app/database"
 	"service-app/handlers"
 	"time"
 )
+
+// go mod tidy - download required dependencies
+// it should be the first step after downloading a go project
 
 func main() {
 	log := log.New(os.Stdout, "users: ", log.LstdFlags|log.Lshortfile)
@@ -21,13 +27,50 @@ func main() {
 
 // startApp set up dependencies for the project
 func startApp(log *log.Logger) error {
+	// =========================================================================
+	// Start Database
+	log.Println("main : Started : Initializing db support")
+	db, err := database.Open()
+	if err != nil {
+		return fmt.Errorf("connecting to db %w", err)
+	}
+	err = db.Ping()
+	if err != nil {
+		return fmt.Errorf("connecting to db %w", err)
+	}
+
+	// =========================================================================
+	// Initialize authentication support
+	log.Println("main : Started : Initializing authentication support")
+	privatePEM, err := os.ReadFile("private.pem")
+	if err != nil {
+		return fmt.Errorf("reading auth private key %w", err)
+	}
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privatePEM)
+	if err != nil {
+		return fmt.Errorf("parsing auth private key %w", err)
+	}
+
+	publicPEM, err := os.ReadFile("pubkey.pem")
+	if err != nil {
+		return fmt.Errorf("reading auth public key %w", err)
+	}
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicPEM)
+	if err != nil {
+		return fmt.Errorf("parsing auth public key %w", err)
+	}
+
+	a, err := auth.NewAuth(privateKey, publicKey)
+	if err != nil {
+		return fmt.Errorf("constructing auth %w", err)
+	}
 
 	log.Println("main : Started : initializing handlers support")
 	api := http.Server{
 		Addr:         ":8080",
 		ReadTimeout:  8000 * time.Second,
 		WriteTimeout: 800 * time.Second,
-		Handler:      handlers.Api(), // register handler functions
+		Handler:      handlers.Api(log, a), // register handler functions
 	}
 
 	serverErrors := make(chan error, 1)
